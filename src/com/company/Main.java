@@ -4,7 +4,7 @@ import com.company.library.socket.Server;
 import com.company.library.thread.Executor;
 
 public class Main {
-    public static void main(String[] args) throws Throwable  {
+    public static void main(String[] args) throws Throwable {
         // Start commands executor process!
         Executor executor = new Executor();
         (new Thread(executor)).start();

@@ -12,11 +12,12 @@ import java.io.BufferedReader;
 public class Server {
 
     protected static Executor executor;
+
     /**
      * Start socket server
      * @param port
      */
-    public static void start(Executor exe, int port)    {
+    public static void start(Executor exe, int port) {
         executor = exe;
 
         try {
@@ -29,7 +30,7 @@ public class Server {
                 System.err.println("Client accepted");
                 new Thread(new SocketProcessor(s)).start();
             }
-        }catch (Throwable t) {
+        } catch (Throwable t) {
         }
     }
 
@@ -43,6 +44,7 @@ public class Server {
 
         /**
          * Init variables!
+         *
          * @param s
          * @throws Throwable
          */
@@ -55,7 +57,7 @@ public class Server {
         public void run() {
             try {
                 readInputHeaders();
-                writeResponse("<html><body><h1>Hello from Habrahabr</h1></body></html>");
+                //writeResponse("");
             } catch (Throwable t) {
             } finally {
                 try {
@@ -73,9 +75,10 @@ public class Server {
 
         private void readInputHeaders() throws Throwable {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            while(true) {
+            while (true) {
                 String s = br.readLine();
-                if(s == null || s.trim().length() == 0) {
+
+                if (s == null || s.trim().length() == 0) {
                     break;
                 }
 
