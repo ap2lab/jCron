@@ -33,6 +33,11 @@ calls command after specified time passed. One time call
  ------------------------------------------------------------------------------------------------
  
 #every: "interval" => "command" identified "identifier"
+
 every: 5 minutes/hours    => ls -alh identified asdasd4545asd125as45
-every: 14:05 on monday    => ls -alh identified asdasd4545asd125as45
-every: 21:00
+
+every: 14:05 on monday, friday   => ls -alh identified asdasd4545asd125as45
+
+every: 21:00  // every day at 21:00
+
+every: *:10   // 10:10, 11:10, 12:10, 13:10 , etc... 
