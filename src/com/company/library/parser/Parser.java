@@ -13,25 +13,21 @@ public class Parser {
     /**
      * "at" command pattern
      */
-    final static String patternAt = "at:\\s?\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\s?=>\\s?(.+)";
+    final static String patternAt = "at:\\s?(\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2})\\s?=>\\s?(.+)\\s?(identifier(.+))";
 
     /**
      * "in" command matche patterns
      */
-    final static String patternIn1 = "in:\\s?(a minute|an hour|a day|a week|a month|a year)\\s?=>\\s?(.+)";
-    final static String patternIn2 = "in:\\s?(\\d+)\\s(minutes|hours|days|weeks|months|years)\\s?=>\\s?(.+)";
-    final static String patternIn3 = "in:\\s?(\\d+Y)?(\\d+M)?(\\d+D)?(\\d+H)?(\\d+M)?\\s?=>\\s?(.+)";
+    final static String patternIn1 = "in:\\s?(a minute|an hour|a day|a week|a month|a year)\\s?=>\\s?(.+)\\s(identifier(.+))";
+    final static String patternIn2 = "in:\\s?(\\d+)\\s(minutes|hours|days|weeks|months|years)\\s?=>\\s?(.+)(identifier(.+))";
+    final static String patternIn3 = "in:\\s?(\\d+Y)?(\\d+M)?(\\d+D)?(\\d+H)?(\\d+M)?\\s?=>\\s?(.+)(identifier(.+))";
 
     /**
      * @param command command string
      * @return AbstractMap.SimpleEntry<~>
      */
-    public static AbstractMap.SimpleEntry<Date, String> parseIt(String command) {
-        try {
-            return Parser.getParser(command).parse(command);
-        } catch (Throwable t) {
-            return null;
-        }
+    public static AbstractMap.SimpleEntry<Date, JobItem> parseIt(String command) throws Throwable {
+        return Parser.getParser(command).parse(command);
     }
 
     /**
@@ -44,8 +40,7 @@ public class Parser {
     public static IParser getParser(String query) throws Throwable {
 
         // "At" parser
-        // Example - at: 2015-04-05 18:14:07 => ls -alh
-
+        // Example - at: 2015-04-05 18:14:07 => ls -alh identifier asda5sd4asd4asd547asd4
         if (query.matches(Parser.patternAt)) {
             System.out.println("Parser \"at\" detected");
             return new ParserAt();

@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.company.library.parser.JobItem;
 import com.company.library.parser.Parser;
 
 public class Executor extends Thread {
@@ -14,49 +15,38 @@ public class Executor extends Thread {
     /**
      * Commands container
      */
-    protected static HashMap<Date, ArrayList<String>> oneTimeCommands = new HashMap<Date, ArrayList<String>>();
+    protected static HashMap<Date, ArrayList<JobItem>> oneTimeCommands = new HashMap<Date, ArrayList<JobItem>>();
 
     /**
      * Add command to commands list
      *
-     * @param date
-     * @param command
+     * @param date Date
+     * @param job  JobItem
      * @return boolean
      */
-    protected boolean addCommand(Date date, String command) {
-        ArrayList<String> dCommands = new ArrayList<String>();
+    protected boolean addCommand(Date date, JobItem job) {
+        ArrayList<JobItem> dCommands = new ArrayList<JobItem>();
         if (Executor.oneTimeCommands.containsKey(date)) {
             dCommands = Executor.oneTimeCommands.get(date);
         }
-        dCommands.add(command);
-        Executor.oneTimeCommands.put(date, dCommands);
 
-        return true;
-    }
-
-    /**
-     * Remove command from commands list
-     *
-     * @param date
-     * @param string
-     * @return boolean
-     */
-    public boolean removeCommand(Date date, String string) {
-        if (!Executor.oneTimeCommands.containsKey(date)) {
+        try {
+            job.save();
+            dCommands.add(job);
+            Executor.oneTimeCommands.put(date, dCommands);
+            return true;
+        }catch(Exception exception) {
             return false;
         }
-
-        ArrayList<String> dCommands = Executor.oneTimeCommands.get(date);
-        return dCommands.remove(string);
     }
 
     /**
      * Get date commands
      *
-     * @param date
+     * @param date Date
      * @return ArrayList
      */
-    public ArrayList<String> commands(Date date) {
+    public ArrayList<JobItem> commands(Date date) {
         if (!Executor.oneTimeCommands.containsKey(date)) {
             return null;
         }
@@ -65,17 +55,16 @@ public class Executor extends Thread {
     }
 
     /**
-     * @param command
-     * @return
+     * @param command String
+     * @return boolean
      */
-    public boolean processCommand(String command) {
-        try {
-            AbstractMap.SimpleEntry<Date, String> pair = Parser.parseIt(command);
-            addCommand(pair.getKey(), pair.getValue());
-        } catch (Throwable t) {
-            return false;
+    public boolean processCommand(String command) throws Throwable {
+        AbstractMap.SimpleEntry<Date, JobItem> pair = Parser.parseIt(command);
+        if(pair == null) {
+            throw new Throwable();
         }
-        return true;
+
+        return addCommand(pair.getKey(), pair.getValue());
     }
 
     public void run() {
@@ -94,7 +83,7 @@ public class Executor extends Thread {
             System.out.println(dateWithoutTime);
             System.out.println("=======================================");
 
-            if(Executor.oneTimeCommands.containsKey(dateWithoutTime)) {
+            if (Executor.oneTimeCommands.containsKey(dateWithoutTime)) {
                 System.out.println("Commands found for : " + dateWithoutTime);
                 executeCommand(Executor.oneTimeCommands.get(dateWithoutTime));
                 Executor.oneTimeCommands.remove(dateWithoutTime);
@@ -110,17 +99,20 @@ public class Executor extends Thread {
     /**
      * Execute shell command
      *
-     * @param commands
+     * @param commands list
      */
-    public static void executeCommand(ArrayList<String> commands) {
+    public static void executeCommand(ArrayList<JobItem> commands) {
         try {
-            for (String cmd : commands) {
+            for (JobItem cmd : commands) {
                 System.out.println(cmd);
 
                 // Run ls command
-                Process process = Runtime.getRuntime().exec(cmd);
+                Process process = Runtime.getRuntime().exec(cmd.getCommand());
                 OutputStream output = process.getOutputStream();
                 process.waitFor();
+
+                // Remove from db "one time executed command"
+                cmd.remove();
 
                 PrintStream prtStrm = System.out;
                 prtStrm = new PrintStream(output);

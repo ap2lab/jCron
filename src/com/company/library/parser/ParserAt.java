@@ -2,29 +2,51 @@ package com.company.library.parser;
 
 import com.company.library.behavior.IParser;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ParserAt extends Parser implements IParser {
 
     protected boolean isSuccess = false;
 
-    public AbstractMap.SimpleEntry<Date, String> parse(String rawtext) throws Throwable {
-        // Split query string by :
-        String delimiters = "at:\\s?|\\s?=>\\s?";
-        String[] tokensVal = rawtext.split(delimiters);
-
-        String dateString = tokensVal[1].trim();
-        String command = tokensVal[2].trim();
-
-        Date date = super.isValidDate(dateString, Parser.DATE_MYSQL_FORMAT);
-        if (date == null) {
-            throw new Error("Invalid date provided");
+    /**
+     * parse "at" command
+     *
+     * @param rawtext command text
+     * @return AbstractMap.SimpleEntry<~>
+     * @throws Throwable
+     */
+    public AbstractMap.SimpleEntry<Date, JobItem> parse(String rawtext) throws Throwable {
+        // Match "at" pattern string to get parts
+        Pattern pattern = Pattern.compile(Parser.patternAt);
+        Matcher matcher = pattern.matcher(rawtext);
+        if (!matcher.find()) {
+            isSuccess = false;
+            throw new Throwable();
         }
 
+        // String to date
+        DateFormat format = new SimpleDateFormat(Parser.DATE_MYSQL_FORMAT);
+        Date date = format.parse(matcher.group(1));
+        if (date.before(new Date())) {
+            return null;
+        }
+
+        // Parse identifier
+        String[] parts = matcher.group(3).split(" ");
+
+        // Create & fill cronjob model
+        JobItem job = new JobItem();
+        job.setExecutionDate(date).setCommand(matcher.group(2)).setIdentifier(parts[1]);
+
+        // Set successfully parsed!
         isSuccess = true;
 
-        return new AbstractMap.SimpleEntry<Date, String>(date, command);
+        return new AbstractMap.SimpleEntry<Date, JobItem>(date, job);
     }
 
     public boolean isSuccess() {

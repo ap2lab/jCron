@@ -18,28 +18,28 @@ public class ParserIn extends Parser implements IParser {
      * @return AbstractMap.SimpleEntry<>
      * @throws Throwable
      */
-    public AbstractMap.SimpleEntry<Date, String> parse(String rawtext) throws Throwable {
+    public AbstractMap.SimpleEntry<Date, JobItem> parse(String rawtext) throws Throwable {
         Matcher matcher;
 
         if (rawtext.matches(Parser.patternIn1)) {
             Pattern pattern = Pattern.compile(Parser.patternIn1);
             matcher = pattern.matcher(rawtext);
 
-            return getPairFromPattern1(matcher);
+            return getModelFromPattern1(matcher);
         }
 
         if (rawtext.matches(Parser.patternIn2)) {
             Pattern pattern = Pattern.compile(Parser.patternIn2);
             matcher = pattern.matcher(rawtext);
 
-            return getPairFromPattern2(matcher);
+            return getModelFromPattern2(matcher);
         }
 
         if (rawtext.matches(Parser.patternIn3)) {
             Pattern pattern = Pattern.compile(Parser.patternIn3);
             matcher = pattern.matcher(rawtext);
 
-            return getPairFromPattern3(matcher);
+            return getModelFromPattern3(matcher);
         }
 
 
@@ -52,7 +52,7 @@ public class ParserIn extends Parser implements IParser {
      * @param matcher pattern1 matcher
      * @return AbstractMap.SimpleEntry<>
      */
-    public AbstractMap.SimpleEntry<Date, String> getPairFromPattern1(Matcher matcher) {
+    public AbstractMap.SimpleEntry<Date, JobItem> getModelFromPattern1(Matcher matcher) {
 
         // Find matches for pattern 1
         if (!matcher.find()) {
@@ -78,8 +78,14 @@ public class ParserIn extends Parser implements IParser {
         }
         Date executionDate = cal.getTime();
 
+        // Parse identifier
+        String[] parts = matcher.group(3).split(" ");
+
+        // Create & fill model
+        JobItem jobItem = new JobItem();
+        jobItem.setExecutionDate(executionDate).setCommand(matcher.group(2)).setIdentifier(parts[1]);
         // Result!
-        return new AbstractMap.SimpleEntry<Date, String>(executionDate, matcher.group(2));
+        return new AbstractMap.SimpleEntry<Date, JobItem>(executionDate, jobItem);
     }
 
     /**
@@ -88,7 +94,7 @@ public class ParserIn extends Parser implements IParser {
      * @param matcher pattern2 matcher
      * @return AbstractMap.SimpleEntry<>
      */
-    public AbstractMap.SimpleEntry<Date, String> getPairFromPattern2(Matcher matcher) {
+    public AbstractMap.SimpleEntry<Date, JobItem> getModelFromPattern2(Matcher matcher) {
         // Find matches for pattern 1
         if (!matcher.find()) {
             throw new IllegalStateException();
@@ -114,8 +120,14 @@ public class ParserIn extends Parser implements IParser {
         }
         Date executionDate = cal.getTime();
 
+        // Parse identifier
+        String[] parts = matcher.group(3).split(" ");
+
+        // Create & fill model
+        JobItem jobItem = new JobItem();
+        jobItem.setExecutionDate(executionDate).setCommand(matcher.group(2)).setIdentifier(parts[1]);
         // Result!
-        return new AbstractMap.SimpleEntry<Date, String>(executionDate, matcher.group(3));
+        return new AbstractMap.SimpleEntry<Date, JobItem>(executionDate, jobItem);
     }
 
     /**
@@ -124,7 +136,7 @@ public class ParserIn extends Parser implements IParser {
      * @param matcher pattern3 matcher
      * @return AbstractMap.SimpleEntry<>
      */
-    public AbstractMap.SimpleEntry<Date, String> getPairFromPattern3(Matcher matcher) {
+    public AbstractMap.SimpleEntry<Date, JobItem> getModelFromPattern3(Matcher matcher) {
         // Find matches for pattern 1
         if (!matcher.find()) {
             throw new IllegalStateException();
@@ -160,8 +172,14 @@ public class ParserIn extends Parser implements IParser {
 
         Date executionDate = cal.getTime();
 
+        // Parse identifier
+        String[] parts = matcher.group(3).split(" ");
+
+        // Create & fill model
+        JobItem jobItem = new JobItem();
+        jobItem.setExecutionDate(executionDate).setCommand(matcher.group(2)).setIdentifier(parts[1]);
         // Result!
-        return new AbstractMap.SimpleEntry<Date, String>(executionDate, matcher.group(6));
+        return new AbstractMap.SimpleEntry<Date, JobItem>(executionDate, jobItem);
     }
 
     /**

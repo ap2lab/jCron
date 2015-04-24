@@ -1,14 +1,16 @@
 package com.company.library.behavior;
 
+import com.company.library.parser.JobItem;
+
 import java.util.AbstractMap;
 import java.util.Date;
 
 public interface IParser {
 	/**
 	 * Parser command
-	 * @param rawtext
+	 * @param rawtext command text
 	 */
-	AbstractMap.SimpleEntry<Date, String> parse(String rawtext) throws Throwable;
+	AbstractMap.SimpleEntry<Date, JobItem> parse(String rawtext) throws Throwable;
 
 	/**
 	 * Is successfully parsed?!

@@ -22,11 +22,13 @@ public class Command extends MySQLAccess {
     private ResultSet resultSet = null;
 
     /**
+     * Add command to db!
+     *
      * @param command    command string
      * @param date       execution date
      * @param identifier identifier string
      */
-    public void addCommand(String command, Date date, String identifier, String type) throws Exception {
+    public int addCommand(String command, Date date, String identifier, String type) throws Exception {
         preparedStatement = super.getConnection()
                 .prepareStatement("INSERT INTO command SET command=?, `execution_date`=?, identifier=?, `type`=?");
 
@@ -37,8 +39,26 @@ public class Command extends MySQLAccess {
         preparedStatement.setString(2, dateString);
         preparedStatement.setString(3, identifier);
         preparedStatement.setString(4, type);
-
         preparedStatement.executeUpdate();
 
+
+        ResultSet rs = preparedStatement.getGeneratedKeys();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    /**
+     * Remove command from db!
+     *
+     * @param id command id
+     * @return boolean
+     * @throws Exception
+     */
+    public boolean removeCommandById(int id) throws Exception {
+        preparedStatement = super.getConnection().prepareStatement("DELETE FROM command WHERE id=?");
+        preparedStatement.setInt(1, id);
+        preparedStatement.executeUpdate();
+
+        return true;
     }
 }
